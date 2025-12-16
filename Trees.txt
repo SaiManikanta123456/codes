@@ -1,0 +1,1149 @@
+#include<bits/stdc++.h>
+using namespace std;
+
+struct Node {
+    int data;
+    Node* left;
+    Node* right;
+
+    Node(int val) {
+        data = val;
+        left = right = NULL;
+    }
+};
+
+bool isLeaf(Node* root)
+{
+    if(root->left==NULL && root->right==NULL)
+    return true;
+
+    return false;
+}
+
+void leftB(Node* root,vector<int> &res)
+{
+    if(!root) return;
+    Node* cur=root->left;
+    while(cur)
+    {
+        if(!isLeaf(cur))
+        res.push_back(cur->data);
+
+        if(cur->left!=NULL)
+        cur=cur->left;
+        else
+        cur=cur->right;
+    }
+}
+
+void leafB(Node* root,vector<int> &res)
+{
+
+    if(root==NULL)
+        return;
+
+    if(isLeaf(root))
+    {
+        res.push_back(root->data);
+        return;
+    }
+
+    leafB(root->left,res);
+    leafB(root->right,res);
+
+}
+
+void rightB(Node* root,vector<int> &res)
+{
+    if(!root) return;
+    stack<int>st;
+    Node* cur=root->right;
+    while(cur)
+    {
+        if(!isLeaf(cur))
+        st.push(cur->data);
+
+        if(cur->right!=NULL)
+        cur=cur->right;
+        else
+        cur=cur->left;
+    }
+
+    while(!st.empty())
+    {
+        res.push_back(st.top());
+        st.pop();
+    }
+}
+
+void boundaryTraversal(Node* root)
+{
+    vector<int>res;
+    if(root==NULL)
+    return;
+
+    if(isLeaf(root))
+    {
+        cout << root->data << " ";
+        return;
+    }
+    
+
+    res.push_back(root->data);
+
+    leftB(root,res);
+    leafB(root,res);
+    rightB(root,res);
+
+    for(auto i:res)
+    cout<<i<<" ";
+}
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+void leftView(Node* root,int level,unordered_map<int,Node*> &mp)
+{
+    vector<int>res;
+    if(root==NULL)
+    return;
+    if(mp.find(level)==mp.end())
+    {
+        cout<<root->data<<" ";
+        mp[level]=root;
+    }
+    leftView(root->left,level+1,mp);
+    leftView(root->right,level+1,mp);
+}
+
+void rightView(Node* root,int level,unordered_map<int,Node*> &mp)
+{
+    vector<int>res;
+    if(root==NULL)
+    return;
+    if(mp.find(level)==mp.end())
+    {
+        cout<<root->data<<" ";
+        mp[level]=root;
+    }
+    leftView(root->right,level+1,mp);
+    leftView(root->left,level+1,mp);
+}
+
+void levelOrder(Node* root)
+{
+    vector<int>a;
+    vector<vector<int>>ans;
+        if(!root)
+        return;
+
+        queue<Node*>q;
+        q.push(root);
+
+        while(!q.empty())
+        {
+            int size=q.size();
+            vector<int>v;
+            for(int i=0;i<size;i++)
+            {
+                Node* node=q.front();
+                q.pop();
+                if(node->left){
+                q.push(node->left);
+                }
+                if(node->right)
+                q.push(node->right);
+                
+                v.push_back(node->data);
+            }
+
+            ans.push_back(v);
+        }
+     
+        for(auto i:ans)
+        {
+            for(auto j:i)
+            {
+                cout<<j<<" ";
+            }
+            cout<<endl;
+        }
+}
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+void topView(Node* root)
+{
+    if(root==NULL)
+    return;
+
+    queue<pair<Node*,int>>q;
+    q.push({root,0});
+    map<int,int>mp;
+
+    while(!q.empty())
+    {
+        auto i=q.front();
+        q.pop();
+        Node* curNode=i.first;
+        int line=i.second;
+
+        if(mp.find(line)==mp.end())
+        {
+            mp[line]=curNode->data;
+        }
+
+        if(curNode->left!=NULL)
+        q.push({curNode->left,line-1});
+        
+        if(curNode->right!=NULL)
+        q.push({curNode->right,line+1});
+    }
+
+    for(auto i:mp)
+    cout<<i.second<<" ";
+}
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+bool isSymmetricHelp(Node* l,Node* r)
+{
+    if(l==NULL || r==NULL)
+    return l==r;
+
+    if(l->data!=r->data)
+    return false;
+
+    return isSymmetricHelp(l->right,r->left) && isSymmetricHelp(l->left,r->right);
+}
+bool isSymmetric(Node* root)
+{
+    if(root==NULL)
+    return true;
+
+    return isSymmetricHelp(root->left,root->right);
+}
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+void rootToLeaf(Node* root,vector<vector<int>> &ans,vector<int> &ds)
+{
+    if(!root)
+    {
+        return;
+    }
+
+    ds.push_back(root->data);
+
+    if(root->left==NULL && root->right==NULL)
+    {
+        ans.push_back(ds);
+    }
+
+    rootToLeaf(root->left,ans,ds);
+    rootToLeaf(root->right,ans,ds);
+    ds.pop_back();
+}
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+bool rootToNode(Node* root,vector<int> &ds,int x)
+{
+    if(!root)
+    return false;
+
+    ds.push_back(root->data);
+
+    if(root->data==x)
+    {
+        return true;
+    }
+
+    if(rootToNode(root->left,ds,x) || rootToNode(root->right,ds,x))
+    return true;
+
+    ds.pop_back();
+    return false;
+}
+
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+void parent_child(Node* root,unordered_map<Node*,Node*> &mp)
+{
+    if(!root)
+    return;
+
+    queue<Node*>q;
+    q.push(root);
+
+    while(!q.empty())
+    {
+        Node* curNode=q.front();
+        q.pop();
+
+        if(curNode->left!=NULL)
+        {
+            q.push(curNode->left);
+            mp[curNode->left]=curNode;
+        }
+        
+        if(curNode->right!=NULL)
+        {
+            q.push(curNode->right);
+            mp[curNode->right]=curNode;
+        }
+    }
+}
+
+void distAtK(Node* root, vector<int>& ds, int k, Node* target) {
+    if (!root) return;
+
+    unordered_map<Node*, Node*> mp;
+    parent_child(root, mp);
+
+    unordered_map<Node*, bool> visited;  //Why visited Map ---> In plain Level Order Traversal We won't go to parent, we just go to left and right. But here we are going to parent also. To avoid inserting again in queue we need visited[][]. Do a dry run, You'll understand. 
+    queue<Node*> q;
+    q.push(target);
+    visited[target] = true;
+
+    int level = 0;
+
+    while (!q.empty()) {
+        int size = q.size();
+        if (level == k) break;
+
+        for (int i = 0; i < size; i++) {
+            Node* curNode = q.front();
+            q.pop();
+
+            if (curNode->left && !visited[curNode->left]) {
+                q.push(curNode->left);
+                visited[curNode->left] = true;
+            }
+            if (curNode->right && !visited[curNode->right]) {
+                q.push(curNode->right);
+                visited[curNode->right] = true;
+            }
+            if (mp[curNode] && !visited[mp[curNode]]) {
+                q.push(mp[curNode]);
+                visited[mp[curNode]] = true;
+            }
+        }
+        level++;
+    }
+
+    while (!q.empty()) {
+        ds.push_back(q.front()->data);
+        q.pop();
+    }
+}
+
+Node* parent_child_target(Node* root,int start,unordered_map<Node*,Node*> &mp)
+{
+    if(!root)
+    return NULL;
+
+    queue<Node*>q;
+    q.push(root);
+
+    Node* target=NULL;
+
+    while(!q.empty())
+    {
+        Node* curNode=q.front();
+        q.pop();
+        if(curNode->data==start)
+        target=curNode;
+        
+        if(curNode->left)
+        {
+            q.push(curNode->left);
+            mp[curNode->left]=curNode;
+        }
+        if(curNode->right)
+        {
+            q.push(curNode->right);
+            mp[curNode->right]=curNode;
+        }
+    }
+
+    return target;
+}
+
+int MinTimeToBurnHelp(Node* root,unordered_map<Node*,Node*> &mp,Node* target)
+{
+    if(!root)
+    return 0;
+
+    int time=0;
+    queue<Node*>q;
+    q.push(target);
+    unordered_map<Node*,bool>visited;
+    visited[target]=true;
+
+    while(!q.empty())
+    {
+        int size=q.size();
+        int f=0;
+        for(int i=0;i<size;i++)
+        {
+            Node* curNode=q.front();
+            q.pop();
+
+            if(curNode->left && !visited[curNode->left])
+            {
+                f=1;
+                q.push(curNode->left);
+                visited[curNode->left]=true;
+            }
+            if(curNode->right && !visited[curNode->right])
+            {
+                f=1;
+                q.push(curNode->right);
+                visited[curNode->right]=true;
+            }
+            if(mp[curNode] && !visited[mp[curNode]])
+            {
+                f=1;
+                q.push(mp[curNode]);
+                visited[mp[curNode]]=true;
+            }
+        }
+        if(f)
+        time++;
+    }
+
+    return time;
+}
+
+void MinTimeToBurn(Node* root,int start)
+{
+    unordered_map<Node*,Node*>mp;
+    Node* target=parent_child_target(root,start,mp);
+    // cout<<target->data;
+    cout<<MinTimeToBurnHelp(root,mp,target);
+}
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+Node* buildTreeHelper(vector<int> &preOrder,int preStart,int preEnd,vector<int> &inOrder,int inStart,int inEnd,map<int,int>inmap)
+{
+    if(preStart>preEnd || inStart>inEnd)
+    return NULL;
+
+    Node* root=new Node(preOrder[preStart]);
+    int inRootPosition=inmap[preOrder[preStart]];
+    int numsLeft=inRootPosition-inStart;
+
+    root->left=buildTreeHelper(preOrder,preStart+1,preStart+1+numsLeft,inOrder,inStart,inRootPosition-1,inmap);
+    root->right=buildTreeHelper(preOrder,preStart+1+numsLeft,preEnd,inOrder,inRootPosition+1,inEnd,inmap);
+
+    return root;
+}
+
+// Node* buildTreeInPre(vector<int> &inOrder,vector<int> &preOrder)
+// {
+//     map<int,int>inmap;
+
+//     for(int i=0;i<inOrder.size();i++)
+//     {
+//         inmap[inOrder[i]]=i;
+//     }
+
+//     Node* root=buildTreeInPostHelper(preOrder,0,preOrder.size()-1,inOrder,0,inOrder.size()-1,inmap);
+
+//     return root;
+// }
+
+Node* buildTreeInPostHelper(vector<int> &postOrder,int postStart,int postEnd,vector<int> &inOrder,int inStart,int inEnd,map<int,int>inmap)
+{
+    if(postStart>postEnd || inStart>inEnd)
+    return NULL;
+
+    Node* root=new Node(postOrder[postEnd]);
+    int inRootPosition=inmap[root->data];
+    int numsLeft=inRootPosition-inStart;
+
+    root->left=buildTreeInPostHelper(postOrder,postStart,postStart+numsLeft-1,inOrder,inStart,inRootPosition-1,inmap);
+    root->right=buildTreeInPostHelper(postOrder,postStart+numsLeft,postEnd-1,inOrder,inRootPosition+1,inEnd,inmap);
+
+    return root;
+}
+
+Node* buildTreeInPost(vector<int> &inOrder,vector<int> &postOrder)
+{
+    map<int,int>inmap;
+
+    for(int i=0;i<inOrder.size();i++)
+    {
+        inmap[inOrder[i]]=i;
+    }
+
+    Node* root=buildTreeInPostHelper(postOrder,0,postOrder.size()-1,inOrder,0,inOrder.size()-1,inmap);
+
+    return root;
+}
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+bool searchInBst(Node* root,int k)
+{
+    if(!root)
+    return false;
+
+    if(root->data==k)
+    return true;
+
+    if(root->data < k)
+    {
+        return searchInBst(root->right,k);
+    }
+
+    return searchInBst(root->left,k);
+}
+
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+void findceil(Node* root,int k,int &maxi)
+{
+    if(!root)
+    return;
+
+    if(root->data==k)
+    {
+    maxi=k;
+    return;
+    }
+
+    if(root->data > k)
+    {
+        maxi=root->data;
+        findceil(root->left,k,maxi);
+    }
+    else
+    {
+        findceil(root->right,k,maxi);
+    }
+}
+
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+void insertInBst(Node* root,int node)
+{
+    if(!root)
+    return;
+
+    Node* cur=root;
+
+    while(true)
+    {
+        if(cur->data < node)
+        {
+            if(cur->left != NULL)
+            cur=cur->left;
+            else
+            {
+            cur->left=new Node(node);break;
+            }
+        }
+        else
+        {
+            if(cur->right !=NULL)
+            cur=cur->right;
+            else{
+            cur->right=new Node(node);break;
+            }
+        }
+    }
+}
+
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+void KthSmallest(Node* root,int &c,int k)
+{
+    if(!root)
+    return;
+
+    KthSmallest(root->left,c,k);
+    c++;
+    if(c==k)
+    {
+        cout<<root->data;
+        return;
+    }
+    KthSmallest(root->right,c,k);
+}
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+Node* lastRighthelper(Node* root)
+{
+    if(root->right==NULL)
+    return root;
+
+    return lastRighthelper(root->right);
+}
+Node* helper(Node* root)
+{
+    if(root->right==NULL)
+    return root->left;
+
+    if(root->left==NULL)
+    return root->right;
+
+    Node* rightRoot=root->right;
+    Node* lastRight=lastRighthelper(root->left);
+    lastRight->right=rightRoot;
+
+    return root->left;
+}
+
+Node* deleteNodeinBst(Node* root,int node)
+{
+    if(!root)
+    return NULL;
+
+    if(root->data==node)
+    return helper(root);
+
+    Node* d=root;
+
+    while(root!=NULL)
+    {
+        if(root->data>node)
+        {
+        if(root->left!=NULL && root->left->data==node)
+        {
+            root->left=helper(root->left);break;
+        }
+        else
+        {
+            root=root->left;
+        }
+        }
+        else
+        {
+            if(root->right!=NULL && root->right->data==node)
+            {
+                root->right=helper(root->right);break;
+            }
+            else
+            {
+                root=root->right;
+            }
+        }
+    }
+
+    return d;
+}
+
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+Node* lowestCommonAncestor(Node* root,int u,int v)
+{
+    if(!root)
+    return NULL;
+
+    if(u>root->data && v>root->data)
+    {
+        return lowestCommonAncestor(root->right,u,v);
+    }
+    if(u<root->data && v<root->data)
+    {
+        return lowestCommonAncestor(root->left,u,v);
+    }
+
+    return root;
+}
+
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+int main()
+{
+    Node* root = new Node(20);
+    root->left = new Node(10);
+    root->right = new Node(30);
+    root->left->left = new Node(5);
+    root->left->right = new Node(8);
+    root->right->right = new Node(31);
+    root->right->left = new Node(25);
+
+    // boundaryTraversal(root);
+
+    // levelOrder(root);
+
+    unordered_map<int,Node*>mp;
+    leftView(root,0,mp);
+    // rightView(root,0,mp);
+
+    // topView(root);
+
+    // cout<<isSymmetric(root);
+
+    // vector<vector<int>>ans;
+    vector<int>ds;
+    // rootToLeaf(root,ans,ds);
+    // for(auto i:ans)
+    // {
+    //     for(auto j:i)
+    //     {
+    //         cout<<j<<" ";
+    //     }
+    //     cout<<endl;
+    // }
+
+    // cout<<rootToNode(root,ds,6)<<endl;
+    // for(auto i:ds)
+    // cout<<i<<" ";
+
+    // Node* target = root->left;
+    // distAtK(root,ds,1,target);
+    // for(auto i:ds)
+    // cout<<i<<" ";
+
+    // MinTimeToBurn(root,2);
+
+    // vector<int>inOrder{40,20,50,10,60,30};
+    // vector<int>preOrder{10,20,40,50,30,60};
+    // Node* ans=buildTreeInPre(inOrder,preOrder);
+    // levelOrder(ans);
+
+    // vector<int>inOrder{40,20,50,10,60,30};
+    // vector<int>postOrder{40,50,20,60,30,10};
+    // Node* ans=buildTreeInPost(inOrder,postOrder);
+    // levelOrder(ans);
+
+    // cout<<searchInBst(root,31);
+
+    // int maxi=-1;
+    // findceil(root,7,maxi);
+    // cout<<maxi;
+
+    // insertInBst(root,22);
+    // levelOrder(root);
+
+    // int res=-1;
+    // int c=0;
+    // KthSmallest(root,c,2);
+    // cout<<res;
+
+    // Node* ans=deleteNodeinBst(root,10);
+    // levelOrder(ans);
+
+    // Node* ans=lowestCommonAncestor(root,10,8);
+    // cout<<ans->data;
+}
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+#include<bits/stdc++.h>
+using namespace std;
+
+struct Node {
+    int data;
+    Node* left;
+    Node* right;
+
+    Node(int val) {
+        data = val;
+        left = right = NULL;
+    }
+};
+
+bool checkBst(Node* root,int mini,int maxi)
+{
+    if(!root)
+    return true;
+
+    if(root->data <= mini || root->data >= maxi)
+    return false;
+
+    return checkBst(root->left,mini,root->data) && checkBst(root->right,root->data,maxi);
+}
+
+bool searchInBst(Node* root,int node)
+{
+    if(!root)
+    return false;
+
+    Node* curr=root;
+    while(curr!=NULL)
+    {
+        if(curr->data==node)
+        return true;
+
+        if(node < curr->data)
+        {
+            curr=curr->left;
+        }
+        else
+        {
+            curr=curr->right;
+        }
+    }
+    return false;
+}
+
+void inorder(Node* root,vector<int> &a)
+{
+    if(!root)
+    return;
+
+    inorder(root->left,a);
+    a.push_back(root->data);
+    inorder(root->right,a);
+}
+
+void insertInBst(Node* root,int newNode)
+{
+    if(!root)
+    return;
+
+    while(true)
+    {
+        if(newNode < root->data)
+        {
+            if(root->left!=NULL)
+            {
+                root=root->left;
+            }
+            else
+            {
+                root->left=new Node(newNode);break;
+            }
+        }
+        else
+        {
+            if(root->right!=NULL)
+            {
+                root=root->right;
+            }
+            else
+            {
+                root->right=new Node(newNode);break;
+            }
+        }
+    }
+}
+
+Node* help(Node* root)
+{
+    if(root->right==NULL)
+    return root;
+
+    return help(root->right);
+}
+
+Node* helper(Node* root)
+{
+    if(!root)
+    return NULL;
+
+    Node* rightRoot=root->right;
+    Node* rightMost=help(root->left);
+    rightMost->right=rightRoot;
+
+    return root->left;
+}
+
+Node* deleteInBst(Node* root,int delNode)
+{
+    if(!root)
+    return NULL;
+
+    Node* d=root;
+
+    while(root!=NULL)
+    {
+        if(delNode < root->data)
+        {
+            if(root->left!=NULL && root->left->data==delNode)
+            {
+                root->left=helper(root->left);
+            }
+            else
+            {
+                root=root->left;
+            }
+        }
+        else
+        {
+            if(root->right!=NULL && root->right->data==delNode)
+            {
+                root->right=helper(root->right);
+            }
+            else
+            {
+                root=root->right;
+            }
+        }
+    }
+
+
+    return d;
+}
+
+void rootToLeaf(Node* root,vector<vector<int>>&ans,vector<int> &ds)
+{
+    if(!root)
+    return;
+
+    ds.push_back(root->data);
+
+    if(root->left==NULL && root->right==NULL)
+        ans.push_back(ds);
+
+    rootToLeaf(root->left,ans,ds);
+    rootToLeaf(root->right,ans,ds);
+
+    ds.pop_back();
+}
+
+bool rootToNode(Node* root,vector<int> &ds,int node)
+{
+    if(!root)
+    return false;
+
+    ds.push_back(root->data);
+
+    if(root->data==node)
+        return true;
+
+    if(rootToNode(root->left,ds,node) || rootToNode(root->right,ds,node))
+        return true;
+
+    ds.pop_back();
+    return false;
+}
+
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+Max Path Sum
+
+int f(Node* root,int &res)
+{
+    if(!root)
+    return 0;
+
+    int left1=max(0,f(root->left,res));
+    int right1=max(0,f(root->right,res));
+
+    res=max(res,root->data+left1+right1);
+
+    return max(left1,right1)+root->data;
+}
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+Ser-Der BT
+
+#include <bits/stdc++.h>
+using namespace std;
+
+struct Node {
+    int data;
+    Node* left;
+    Node* right;
+
+    Node(int val) {
+        data = val;
+        left = right = NULL;
+    }
+};
+
+string serialize(Node* root)
+{
+    string s="";
+    if(!root)
+    return s;
+
+    queue<Node*>q;
+    q.push(root);
+
+    while(!q.empty())
+    {
+        Node* node=q.front();
+        q.pop();
+
+        if(node)
+        {
+            s=s+to_string(node->data)+",";
+            q.push(node->left);
+            q.push(node->right);
+        }
+        else
+        {
+            s=s+("N,");
+        }
+    }
+
+    return s;
+}
+
+void levelOrder(Node* root)
+{
+    vector<int>a;
+    vector<vector<int>>ans;
+        if(!root)
+        return;
+
+        queue<Node*>q;
+        q.push(root);
+
+        while(!q.empty())
+        {
+            int size=q.size();
+            vector<int>v;
+            for(int i=0;i<size;i++)
+            {
+                Node* node=q.front();
+                q.pop();
+                if(node->left){
+                q.push(node->left);
+                }
+                if(node->right)
+                q.push(node->right);
+                
+                v.push_back(node->data);
+            }
+
+            ans.push_back(v);
+        }
+     
+        for(auto i:ans)
+        {
+            for(auto j:i)
+            {
+                cout<<j<<" ";
+            }
+            cout<<endl;
+        }
+}
+
+Node* deserialize(string s)
+{
+    if(s.length()==0)
+    return nullptr;
+
+    stringstream ss(s);
+    string str;
+
+    getline(ss,str,',');
+    Node* root=new Node(stoi(str));
+    queue<Node*>q;
+    q.push(root);
+
+    while(!q.empty())
+    {
+        Node* node=q.front();
+        q.pop();
+
+        if(getline(ss,str,','))
+        {
+            if(str!="N"){
+            node->left=new Node(stoi(str));
+            q.push(node->left);
+            }
+        }
+        if(getline(ss,str,','))
+        {
+            if(str!="N"){
+            node->right=new Node(stoi(str));
+            q.push(node->right);
+            }
+        }
+    }
+
+    return root;
+}
+
+int main()
+{
+    Node* root = new Node(20);
+    root->left = new Node(10);
+    root->right = new Node(30);
+    // root->left->left = new Node(5);
+    root->left->right = new Node(8);
+    root->right->right = new Node(31);
+    root->right->left = new Node(25);
+
+    string s=serialize(root);
+    cout<<s<<endl;
+    Node* tree=deserialize(s);
+    levelOrder(tree);
+}
+
+
